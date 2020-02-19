@@ -22,13 +22,50 @@ class PageState extends StatefulWidget{
 }
 
 class _PageState extends State<PageState>{
-  static List<ChartItem> seriesList = DonutAutoLabelChart._createSampleData();
-  static int totalAmount = seriesList.map((i) => i.value).reduce((acc, item) => acc + item);
-  
+  static List<ChartItem> _chartData = DonutAutoLabelChart._createSampleData();
+  int _totalAmount = _chartData.map((i) => i.value).reduce((acc, item) => acc + item);
+  int _currentPage = 0;
+
   void randomizeData(){
     setState(() {
-      seriesList = DonutAutoLabelChart._createSampleData();
-      totalAmount = seriesList.map((i) => i.value).reduce((acc, item) => acc + item);
+      _chartData = DonutAutoLabelChart._createSampleData();
+      _totalAmount = _chartData.map((i) => i.value).reduce((acc, item) => acc + item);
+    });
+  }
+
+  Widget renderPage(int index){
+    switch(index){
+      case 1:
+        return Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text('Página 2', style: TextStyle(fontSize: 25, color: Colors.grey))
+        ]);
+      case 2:
+        return Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text('Página 3', style: TextStyle(fontSize: 25, color: Colors.grey))
+        ]);
+      default:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text(
+              'Patrimônio: $_totalAmount K',
+              style: TextStyle(fontSize: 25, color: Colors.grey),
+            ),
+            new Padding(
+              padding: new EdgeInsets.all(32.0),
+              child: new SizedBox(
+                height: 400.0,
+                child: DonutAutoLabelChart('Stocks Allocation', _chartData, animate: widget.animate,),
+              ),
+            )
+          ],
+        );
+    }
+  }
+
+  void _onChangePage(int index) {
+    setState(() {
+      _currentPage = index;
     });
   }
 
@@ -39,26 +76,30 @@ class _PageState extends State<PageState>{
         title: Text(widget.title),
       ),
       backgroundColor: Colors.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Text(
-            'Patrimônio: $totalAmount K',
-            style: TextStyle(fontSize: 25, color: Colors.grey),
-          ),
-          new Padding(
-            padding: new EdgeInsets.all(32.0),
-            child: new SizedBox(
-              height: 400.0,
-              child: DonutAutoLabelChart('Stocks Allocation', seriesList, animate: widget.animate,),
-            ),
-          )
-        ],
-      ),
+      body: renderPage(_currentPage),
       floatingActionButton: FloatingActionButton(
         onPressed: randomizeData,
         child: Icon(Icons.refresh),
         backgroundColor: Colors.blue,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pie_chart),
+            title: Text('Carteira'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart),
+            title: Text('Rentabilidade'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            title: Text('Cotações'),
+          ),
+        ],
+        currentIndex: _currentPage,
+        selectedItemColor: Colors.blue[700],
+        onTap: _onChangePage,
       ),
     );
   }
@@ -90,7 +131,6 @@ class DonutAutoLabelChart extends StatelessWidget {
             domainFn: (ChartItem item, _) => seriesList.indexOf(item),
             measureFn: (ChartItem item, _) => item.value,
             data: seriesList,
-            // Set a label accessor to control the text of the arc label.
             labelAccessorFn: (ChartItem row, _) => '${row.name}',
           )
         ],
@@ -100,7 +140,8 @@ class DonutAutoLabelChart extends StatelessWidget {
           arcRendererDecorators: [
             new charts.ArcLabelDecorator(),
           ],
-        ));
+        )
+    );
   }
 
   static List<ChartItem> _createSampleData() {
