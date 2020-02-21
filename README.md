@@ -1,4 +1,6 @@
 # Portfolio Follow App
 
-<img src="./images/Screenshot_1582084275.png" alt="Screenshot" width="400"/>
-<img src="./images/Screenshot_1582260047.png" alt="Screenshot" width="400"/>
+<p>
+<img src="https://raw.githubusercontent.com/luigihenrick/portfolio-follow-app/master/images/Screenshot_1582084275.png" width="260px">
+<img src="https://github.com/luigihenrick/portfolio-follow-app/blob/master/images/Screenshot_1582260047.png" width="260px">
+</p>
