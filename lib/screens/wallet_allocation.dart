@@ -1,10 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
-class WalletPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:portfolio_follow/components/donut_chart.dart';
+
+const _chartTitle = 'Wallet Allocation';
+
+class WalletAllocation extends StatelessWidget {
   final List<DonutChartItem> chartData;
   final bool animate;
 
-  WalletPage(this.chartData, {this.animate});
+  WalletAllocation(this.chartData, {this.animate});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class WalletPage extends StatelessWidget {
           child: new SizedBox(
             height: 400.0,
             child: DonutChart(
-              'Stocks Allocation',
+              _chartTitle,
               chartData,
               animate: animate,
             ),
@@ -28,5 +33,15 @@ class WalletPage extends StatelessWidget {
         )
       ],
     );
+  }
+
+  static List<DonutChartItem> fetchWalletAllocationData() {
+    var rnd = new Random();
+    return [
+      new DonutChartItem('ABEV3', rnd.nextInt(100)),
+      new DonutChartItem('MGLU3', rnd.nextInt(100)),
+      new DonutChartItem('ITUB4', rnd.nextInt(100)),
+      new DonutChartItem('RADL3', rnd.nextInt(100)),
+    ];
   }
 }

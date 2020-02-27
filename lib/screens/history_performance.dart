@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_follow/components/line_chart.dart';
+import 'package:portfolio_follow/models/history_price.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class HistoryPage extends StatelessWidget{
+const _chartTitle = 'History Prices';
+const _errorMessage = 'Falha ao carregar preço histórico';
+
+class HistoryPerformance extends StatelessWidget {
   final bool animate;
 
   final Future<PriceHistoryDaily> futurePriceHistoryDaily;
 
-  HistoryPage(this.futurePriceHistoryDaily, {this.animate});
+  HistoryPerformance(this.futurePriceHistoryDaily, {this.animate});
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +28,15 @@ class HistoryPage extends StatelessWidget{
                 style: TextStyle(fontSize: 25, color: Colors.grey),
               ),
               new Padding(
-                padding: new EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
+                padding:
+                    new EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
                 child: new SizedBox(
                   height: 400.0,
                   child: LineChart(
-                    'History Prices',
-                    snapshot.data.dailyTimeSeries.map((item) => new LineChartItem(item.date, item.close)).toList(),
+                    _chartTitle,
+                    snapshot.data.dailyTimeSeries
+                        .map((item) => new LineChartItem(item.date, item.close))
+                        .toList(),
                     animate: animate,
                   ),
                 ),
@@ -39,5 +49,15 @@ class HistoryPage extends StatelessWidget{
         return CircularProgressIndicator();
       },
     );
+  }
+
+  static Future<PriceHistoryDaily> fetchPriceHistoryData() async {
+    final response = await http.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo');
+
+    if (response.statusCode == 200) {
+      return PriceHistoryDaily.fromJson(json.decode(response.body));
+    } else {
+      throw Exception(_errorMessage);
+    }
   }
 }
