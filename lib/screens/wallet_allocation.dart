@@ -3,35 +3,53 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/components/donut_chart.dart';
 
+const _pageName = 'Minha Carteira';
 const _chartTitle = 'Wallet Allocation';
 
-class WalletAllocation extends StatelessWidget {
-  final List<DonutChartItem> chartData;
+class WalletAllocation extends StatefulWidget {
   final bool animate;
 
-  WalletAllocation(this.chartData, {this.animate});
+  WalletAllocation({this.animate});
+
+  @override
+  _WalletAllocationState createState() => _WalletAllocationState();
+}
+
+class _WalletAllocationState extends State<WalletAllocation> {
+  List<DonutChartItem> chartData = fetchWalletAllocationData();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Text(
-          'Patrimônio: ${chartData.map((i) => i.value).reduce((acc, item) => acc + item)} K',
-          style: TextStyle(fontSize: 25, color: Colors.grey),
-        ),
-        new Padding(
-          padding: new EdgeInsets.all(32.0),
-          child: new SizedBox(
-            height: 400.0,
-            child: DonutChart(
-              _chartTitle,
-              chartData,
-              animate: animate,
-            ),
+    return Scaffold(
+      appBar: AppBar(title: Text(_pageName)),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            'Patrimônio: ${chartData.map((i) => i.value).reduce((acc, item) => acc + item)} K',
+            style: TextStyle(fontSize: 25, color: Colors.grey),
           ),
-        )
-      ],
+          new Padding(
+            padding: new EdgeInsets.all(25.0),
+            child: new SizedBox(
+              height: 400.0,
+              child: DonutChart(
+                _chartTitle,
+                chartData,
+                animate: widget.animate,
+              ),
+            ),
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => {
+          setState(() {
+            chartData = fetchWalletAllocationData();
+          })
+        },
+        child: Icon(Icons.refresh),
+      ),
     );
   }
 
