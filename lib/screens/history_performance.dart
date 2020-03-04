@@ -18,12 +18,12 @@ class HistoryPerformance extends StatefulWidget {
 }
 
 class _HistoryPerformanceState extends State<HistoryPerformance> {
-  String symbol = 'MSFT';
-  Future<PriceHistoryDaily> futurePriceHistoryDaily;
+  String _symbol = 'MSFT';
+  Future<PriceHistoryDaily> _futurePriceHistoryDaily;
 
   @override
   void initState() {
-    futurePriceHistoryDaily = fetchPriceHistoryData();
+    _futurePriceHistoryDaily = _fetchPriceHistoryData();
     super.initState();
   }
 
@@ -36,7 +36,7 @@ class _HistoryPerformanceState extends State<HistoryPerformance> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           FutureBuilder<PriceHistoryDaily>(
-            future: futurePriceHistoryDaily,
+            future: _futurePriceHistoryDaily,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(
@@ -71,20 +71,62 @@ class _HistoryPerformanceState extends State<HistoryPerformance> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () => {
+          _asyncInputDialog(context).then((stock) {
+            this._symbol = stock;
+            setState(
+              () => {_futurePriceHistoryDaily = _fetchPriceHistoryData()},
+            );
+          })
+        },
         child: Icon(Icons.edit),
       ),
     );
   }
 
-  Future<PriceHistoryDaily> fetchPriceHistoryData() async {
+  Future<PriceHistoryDaily> _fetchPriceHistoryData() async {
     final response = await http.get(
-        'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=$symbol&apikey=demo');
+        'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=$_symbol&apikey=demo');
 
     if (response.statusCode == 200) {
       return PriceHistoryDaily.fromJson(json.decode(response.body));
     } else {
       throw Exception(_errorMessage);
     }
+  }
+
+  Future<String> _asyncInputDialog(BuildContext context) async {
+    String teamName = '';
+    return showDialog<String>(
+      context: context,
+      barrierDismissible:
+          false, // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Qual ativo deseja buscar'),
+          content: new Row(
+            children: <Widget>[
+              new Expanded(
+                  child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Ativo', hintText: 'ex. MGLU3.SAO'),
+                onChanged: (value) {
+                  teamName = value;
+                },
+              ))
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(teamName);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
