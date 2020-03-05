@@ -4,17 +4,17 @@ const _walletPageName = 'Carteira';
 const _historyPageName = 'Rentabilidade';
 const _quotePageName = 'Cotações';
 
-class MenuNavigationBar extends StatefulWidget{
-  int currentPage;
-  void Function(int) onChangePage;
+class SummaryNavigationBar extends StatefulWidget{
+  final int currentPage;
+  final void Function(int) onChangePage;
 
-  MenuNavigationBar(this.currentPage, this.onChangePage);
+  SummaryNavigationBar(this.currentPage, this.onChangePage);
 
   @override
-  _MenuNavigationBarState createState() => _MenuNavigationBarState();
+  _SummaryNavigationBarState createState() => _SummaryNavigationBarState();
 }
 
-class _MenuNavigationBarState extends State<MenuNavigationBar> {
+class _SummaryNavigationBarState extends State<SummaryNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(

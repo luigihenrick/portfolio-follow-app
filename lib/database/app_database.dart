@@ -11,7 +11,7 @@ Future<Database> createTable() async {
   return openDatabase(fullPath, onCreate: (db, version) {
     db.execute('CREATE TABLE asset('
         'id INTEGER PRIMARY KEY, '
-        'name TEXT, '
+        'symbol TEXT, '
         'quantity INTEGER)');
   }, version: 1);
 }
@@ -21,19 +21,30 @@ Future<int> insert(Asset asset) async {
 
   Map<String, dynamic> values = Map();
 
-  values['name'] = asset.name;
+  values['symbol'] = asset.symbol;
   values['quantity'] = asset.quantity;
 
   return db.insert('asset', values);
 }
 
-Future<List<Asset>> selectAll() async {
+Future<int> delete(int assetId) async {
   final Database db = await createTable();
 
-  var assets = await db.query('asset');
-  return assets.map((a) => Asset(
-        id: a['id'],
-        name: a['name'],
-        quantity: a['quantity'],
-      ));
+  return db.delete('asset', where: 'id = ?', whereArgs: [assetId]);
+}
+
+Future<List<Asset>> selectAll() async {
+  final Database db = await createTable();
+  final List<Map<String, dynamic>> assets = await db.query('asset');
+  final List<Asset> result = List();
+
+  for (Map<String, dynamic> asset in assets) {
+    result.add(Asset(
+      id: asset['id'],
+      symbol: asset['symbol'],
+      quantity: asset['quantity'],
+    ));
+  }
+
+  return result;
 }

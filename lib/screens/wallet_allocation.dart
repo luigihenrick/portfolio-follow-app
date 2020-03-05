@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/components/donut_chart.dart';
 
-const _pageName = 'Minha Carteira';
 const _chartTitle = 'Wallet Allocation';
 
 class WalletAllocation extends StatefulWidget {
@@ -21,7 +20,6 @@ class _WalletAllocationState extends State<WalletAllocation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_pageName)),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

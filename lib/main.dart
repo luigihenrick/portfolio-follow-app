@@ -1,48 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_follow/commons/variables.dart';
+import 'package:portfolio_follow/database/app_database.dart';
+import 'package:portfolio_follow/models/asset.dart';
+import 'package:portfolio_follow/models/exchange.dart';
 import 'package:portfolio_follow/screens/history_performance.dart';
-import 'package:portfolio_follow/screens/menu_navigation_bar.dart';
+import 'package:portfolio_follow/screens/my_asset.dart';
+import 'package:portfolio_follow/screens/summary_navigation_bar.dart';
 import 'package:portfolio_follow/screens/realtime_quote.dart';
 import 'package:portfolio_follow/screens/wallet_allocation.dart';
 
 void main() => runApp(MaterialApp(
-      title: 'Portfolio',
-      home: PortfolioApp(title: 'Minha Carteira', animate: true),
+      title: 'PortfolioApp',
+      home: PortfolioApp(),
     ));
 
 class PortfolioApp extends StatefulWidget {
-  final String title;
-  final bool animate;
-
-  PortfolioApp({Key key, this.title, this.animate}) : super(key: key);
-
   @override
   _PortfolioApp createState() => _PortfolioApp();
 }
 
 class _PortfolioApp extends State<PortfolioApp> {
-  int currentPage = 0;
+  static int _currentPage = 0;
+  static List<Page> _pages = [
+    Page(
+      title: 'Minha Carteira',
+      page: WalletAllocation(animate: GlobalVariables.animate),
+      showBottomNavigation: true,
+    ),
+    Page(
+      title: 'Rentabilidade',
+      page: HistoryPerformance(animate: GlobalVariables.animate),
+      showBottomNavigation: true,
+    ),
+    Page(
+      title: 'Cotação',
+      page: RealtimeQuote(),
+      showBottomNavigation: true,
+    ),
+    Page(
+      title: 'Meus Ativos',
+      page: MyAsset(),
+      showBottomNavigation: false,
+    )
+  ];
 
   void updateData(int index) {
     setState(() {
-      currentPage = index;
+      _currentPage = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        body: renderPage(currentPage),
-        bottomNavigationBar: MenuNavigationBar(currentPage, updateData));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_pages[_currentPage].title),
+      ),
+      body: _pages[_currentPage].page,
+      bottomNavigationBar: _pages[_currentPage].showBottomNavigation
+          ? SummaryNavigationBar(_currentPage, updateData)
+          : null,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child:
+                  Text('PortfolioApp', style: TextStyle(color: Colors.white)),
+              decoration: BoxDecoration(color: Colors.blue),
+            ),
+            ListTile(
+              title: Text('Resumo da Posição'),
+              onTap: () {
+                setState(() {
+                  _currentPage = 0;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Meus Ativos'),
+              onTap: () {
+                setState(() {
+                  _currentPage = 3;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
+}
 
-  Widget renderPage(int index) {
-    switch (index) {
-      case 1:
-        return HistoryPerformance(animate: widget.animate);
-      case 2:
-        return RealtimeQuote();
-      default:
-        return WalletAllocation(animate: widget.animate);
-    }
-  }
+class Page {
+  String title;
+  Widget page;
+  bool showBottomNavigation;
+
+  Page({
+    this.title,
+    this.page,
+    this.showBottomNavigation,
+  });
 }
