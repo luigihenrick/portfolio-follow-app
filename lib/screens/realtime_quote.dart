@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_follow/components/input_dialog.dart';
 import 'package:portfolio_follow/models/quote.dart';
 import 'package:portfolio_follow/services/alpha_vantage.dart';
 
@@ -43,46 +44,14 @@ class _RealtimeQuoteState extends State<RealtimeQuote> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
-          _asyncInputDialog(context).then((stock) {
+          asyncInputDialog(context,
+              title: 'Qual ativo deseja buscar',
+          ).then((stock) {
             setState(() => this._symbol = stock);
           })
         },
         child: Icon(Icons.edit),
       ),
-    );
-  }
-
-  Future<String> _asyncInputDialog(BuildContext context) async {
-    String symbol = '';
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Qual ativo deseja buscar'),
-          content: new Row(
-            children: <Widget>[
-              new Expanded(
-                  child: new TextField(
-                autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'Ativo', hintText: 'ex. MGLU3.SAO'),
-                onChanged: (value) {
-                  symbol = value;
-                },
-              ))
-            ],
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop(symbol);
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -3,12 +3,12 @@ import 'package:portfolio_follow/database/app_database.dart';
 import 'package:portfolio_follow/models/asset.dart';
 import 'package:portfolio_follow/models/exchange.dart';
 
-class MyAsset extends StatefulWidget {
+class AssetList extends StatefulWidget {
   @override
-  _MyAssetState createState() => _MyAssetState();
+  _AssetListState createState() => _AssetListState();
 }
 
-class _MyAssetState extends State<MyAsset> {
+class _AssetListState extends State<AssetList> {
   
   Future<void> insertAsset() async {
     await insert(Asset(

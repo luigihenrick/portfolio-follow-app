@@ -4,7 +4,7 @@ import 'package:portfolio_follow/database/app_database.dart';
 import 'package:portfolio_follow/models/asset.dart';
 import 'package:portfolio_follow/models/exchange.dart';
 import 'package:portfolio_follow/screens/history_performance.dart';
-import 'package:portfolio_follow/screens/my_asset.dart';
+import 'package:portfolio_follow/screens/asset_list.dart';
 import 'package:portfolio_follow/screens/summary_navigation_bar.dart';
 import 'package:portfolio_follow/screens/realtime_quote.dart';
 import 'package:portfolio_follow/screens/wallet_allocation.dart';
@@ -39,7 +39,7 @@ class _PortfolioApp extends State<PortfolioApp> {
     ),
     Page(
       title: 'Meus Ativos',
-      page: MyAsset(),
+      page: AssetList(),
       showBottomNavigation: false,
     )
   ];
