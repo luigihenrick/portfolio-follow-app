@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/commons/variables.dart';
-import 'package:portfolio_follow/database/app_database.dart';
-import 'package:portfolio_follow/models/asset.dart';
-import 'package:portfolio_follow/models/exchange.dart';
 import 'package:portfolio_follow/screens/history_performance.dart';
 import 'package:portfolio_follow/screens/asset_list.dart';
 import 'package:portfolio_follow/screens/summary_navigation_bar.dart';

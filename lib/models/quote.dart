@@ -20,14 +20,14 @@ class Quote {
 
 class GlobalQuote {
   String symbol;
-  String open;
-  String high;
-  String low;
-  String price;
-  String volume;
-  String latestTradingDay;
-  String previousClose;
-  String change;
+  double open;
+  double high;
+  double low;
+  double price;
+  int volume;
+  DateTime latestTradingDay;
+  double previousClose;
+  double change;
   String changePercent;
 
   GlobalQuote(
@@ -44,14 +44,14 @@ class GlobalQuote {
 
   GlobalQuote.fromJson(Map<String, dynamic> json) {
     symbol = json['01. symbol'];
-    open = json['02. open'];
-    high = json['03. high'];
-    low = json['04. low'];
-    price = json['05. price'];
-    volume = json['06. volume'];
-    latestTradingDay = json['07. latest trading day'];
-    previousClose = json['08. previous close'];
-    change = json['09. change'];
+    open = double.parse(json['02. open']);
+    high = double.parse(json['03. high']);
+    low = double.parse(json['04. low']);
+    price = double.parse(json['05. price']);
+    volume = int.parse(json['06. volume']);
+    latestTradingDay = DateTime.parse(json['07. latest trading day']);
+    previousClose = double.parse(json['08. previous close']);
+    change = double.parse(json['09. change']);
     changePercent = json['10. change percent'];
   }
 

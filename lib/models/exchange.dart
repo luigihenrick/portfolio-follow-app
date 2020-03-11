@@ -1,4 +1,0 @@
-enum Exchange {
-  nasdaq,
-  bovespa
-}

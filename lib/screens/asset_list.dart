@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:portfolio_follow/database/app_database.dart';
+import 'package:portfolio_follow/commons/variables.dart';
+import 'package:portfolio_follow/components/input_dialog.dart';
+import 'package:portfolio_follow/database/dao/asset_dao.dart';
 import 'package:portfolio_follow/models/asset.dart';
-import 'package:portfolio_follow/models/exchange.dart';
 
 class AssetList extends StatefulWidget {
   @override
@@ -9,38 +10,49 @@ class AssetList extends StatefulWidget {
 }
 
 class _AssetListState extends State<AssetList> {
-  
-  Future<void> insertAsset() async {
-    await insert(Asset(
-      symbol: 'ITUB4',
-      quantity: 40,
-      exchange: Exchange.bovespa,
+  AssetDao _assetDao = AssetDao();
+
+  Future<void> insertAsset(BuildContext context) async {
+    List<InputDialogItem> asset = [
+      InputDialogItem(label: 'Ativo', hint: 'ex. MGLU3', value: ''),
+      InputDialogItem(label: 'Quantidade', hint: 'ex. 100', value: 0),
+    ];
+
+    List<InputDialogItem> result = await asyncInputDialog(context,
+        title: 'Qual ativo deseja adicionar', items: asset);
+
+    if(result == null) return;
+
+    await _assetDao.insert(Asset(
+      symbol: result.firstWhere((r) => r.label == 'Ativo').value.toString().trim(),
+      quantity: int.parse(result.firstWhere((r) => r.label == 'Quantidade').value.toString().trim()),
     ));
 
     setState(() {});
   }
 
   Future<void> deleteAsset(int id) async {
-    await delete(id);
+    await _assetDao.delete(id);
 
     setState(() {});
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: FutureBuilder<List<Asset>>(
-          future: selectAll(),
+          future: _assetDao.selectAllWithPrices(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemBuilder: (_, int index) => ListTile(
                   title: Text(snapshot.data[index].symbol),
-                  subtitle: Text(snapshot.data[index].quantity.toString()),
-                  onLongPress: () => {
-                    deleteAsset(snapshot.data[index].id)
-                  },
+                  subtitle: Text(
+                      'Qtd. ${snapshot.data[index]?.quantity.toString()} '
+                          'R\$: ${snapshot.data[index]?.price.toString()} '
+                          'Atualizado: ${GlobalVariables.dateFormat.format(snapshot.data[index]?.priceUpdated)}'),
+                  onLongPress: () => {deleteAsset(snapshot.data[index].id)},
                 ),
                 itemCount: snapshot.data.length,
               );
@@ -53,7 +65,7 @@ class _AssetListState extends State<AssetList> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => insertAsset(),
+        onPressed: () => insertAsset(context),
       ),
     );
   }
