@@ -76,7 +76,7 @@ class _PortfolioApp extends State<PortfolioApp> {
               },
             ),
             ListTile(
-              title: Text('Meus Ativos'),
+              title: Text('Minhas operações'),
               onTap: () {
                 setState(() {
                   _currentPage = 3;

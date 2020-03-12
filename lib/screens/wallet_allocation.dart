@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:portfolio_follow/commons/variables.dart';
 import 'package:portfolio_follow/components/donut_chart.dart';
 import 'package:portfolio_follow/database/dao/asset_dao.dart';
 import 'package:portfolio_follow/models/asset.dart';
@@ -17,28 +18,33 @@ class WalletAllocation extends StatelessWidget {
         future: fetchWalletAllocationData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            double totalAmount = 0.0;
+
+            for (DonutChartItem item in snapshot.data) {
+              totalAmount += item.value;
+            }
+
             return Scaffold(
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  new Text(
-                    'Patrimônio: R\$ ${snapshot.data.map((i) => i.value).reduce((acc, item) => acc + item)} K',
-                    style: TextStyle(fontSize: 25, color: Colors.grey),
-                  ),
-                  new Padding(
-                    padding: new EdgeInsets.all(25.0),
-                    child: new SizedBox(
-                      height: 400.0,
-                      child: DonutChart(
-                        _chartTitle,
-                        snapshot.data,
-                        animate: animate,
-                      ),
+                body: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text(
+                  'Patrimônio: ${GlobalVariables.currencyFormat.format(totalAmount ?? 0)}',
+                  style: TextStyle(fontSize: 25, color: Colors.grey),
+                ),
+                new Padding(
+                  padding: new EdgeInsets.all(25.0),
+                  child: new SizedBox(
+                    height: 400.0,
+                    child: DonutChart(
+                      _chartTitle,
+                      snapshot.data,
+                      animate: animate,
                     ),
-                  )
-                ],
-              )
-            );
+                  ),
+                )
+              ],
+            ));
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
@@ -54,8 +60,8 @@ Future<List<DonutChartItem>> fetchWalletAllocationData() async {
   List<DonutChartItem> result = List();
 
   for (Asset asset in await assetDao.selectAllWithPrices()) {
-    result.add(
-        DonutChartItem(asset.symbol, asset?.quantity ?? 0 * asset?.price ?? 0));
+    result.add(DonutChartItem(
+        asset.symbol, (asset.quantity * asset.price).toDouble()));
   }
 
   return result;

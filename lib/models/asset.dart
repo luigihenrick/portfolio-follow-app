@@ -3,11 +3,17 @@ class Asset {
   String symbol;
   OperationType type;
   int quantity;
-  DateTime date;
+  DateTime operationDate;
   double price;
   DateTime priceUpdated;
 
-  Asset({this.id, this.symbol, this.quantity, this.price, this.priceUpdated});
+  Asset(
+      {this.id,
+      this.symbol,
+      this.quantity,
+      this.operationDate,
+      this.price,
+      this.priceUpdated});
 }
 
 enum OperationType { C, V }

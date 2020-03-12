@@ -1,55 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:portfolio_follow/components/input_dialog.dart';
-import 'package:portfolio_follow/models/quote.dart';
-import 'package:portfolio_follow/services/alpha_vantage.dart';
+import 'package:portfolio_follow/commons/variables.dart';
+import 'package:portfolio_follow/database/dao/asset_dao.dart';
+import 'package:portfolio_follow/models/asset.dart';
 
-class RealtimeQuote extends StatefulWidget {
-  RealtimeQuote();
-
-  @override
-  _RealtimeQuoteState createState() => _RealtimeQuoteState();
-}
-
-class _RealtimeQuoteState extends State<RealtimeQuote> {
-  String _symbol = 'MGLU3';
+class RealtimeQuote extends StatelessWidget {
+  final AssetDao _assetDao = AssetDao();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            FutureBuilder<Quote>(
-              future: AlphaVantageService.fetchQuoteData(_symbol),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          '${snapshot.data.globalQuote.symbol} - ${snapshot.data.globalQuote.price}',
-                          style: TextStyle(fontSize: 25, color: Colors.grey),
-                        )
-                      ]);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                return CircularProgressIndicator();
-              },
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => {
-          asyncInputDialog(context, title: 'Qual ativo deseja buscar', items: [InputDialogItem(label: 'Ativo', hint: 'ex. MGLU3')]).then((stock) {
-            setState(() => this._symbol = stock.firstWhere((s) => s.label == 'Ativo').value ?? this._symbol);
-          })
+      body: FutureBuilder<List<Asset>>(
+        future: _assetDao.selectAllWithPrices(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView(
+              children: _createWidgets(snapshot),
+            );
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+          return CircularProgressIndicator();
         },
-        child: Icon(Icons.edit),
       ),
     );
+  }
+
+  List<Widget> _createWidgets(AsyncSnapshot<List<Asset>> snapshot) {
+    List<Widget> result = List();
+
+    for (Asset asset in snapshot.data) {
+      result.add(ListTile(
+        title: Text(asset.symbol),
+        subtitle: Text(
+            'R\$ ${asset.price} - Atualizado em: ${GlobalVariables.dateTimeFormat.format(asset.priceUpdated)}'),
+      ));
+    }
+
+    return result;
   }
 }

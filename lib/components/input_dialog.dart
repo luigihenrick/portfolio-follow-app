@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:portfolio_follow/commons/variables.dart';
 
 Future<List<InputDialogItem>> asyncInputDialog(BuildContext context,
     {@required String title, List<InputDialogItem> items}) async {
@@ -47,27 +48,25 @@ List<Widget> buildFields(List<InputDialogItem> items) {
     result.add(
       Row(
         children: <Widget>[
-          item.value is EnumProperty
-              ? Text('item: ${item.value}')
-              : Expanded(
-                  child: new TextField(
-                    autofocus: true,
-                    keyboardType: _getKeyboardType(item),
-                    decoration: new InputDecoration(
-                      labelText: item.label ?? '',
-                      hintText: item.hint ?? '',
-                    ),
-                    onChanged: (value) {
-                      if (item.value is int) {
-                        item.value = int.parse(value);
-                      } else if (item.value is DateTime) {
-                        item.value = DateTime.parse(value);
-                      } else {
-                        item.value = value;
-                      }
-                    },
-                  ),
-                ),
+          Expanded(
+            child: new TextField(
+              autofocus: true,
+              keyboardType: _getKeyboardType(item),
+              decoration: new InputDecoration(
+                labelText: item.label ?? '',
+                hintText: item.hint ?? '',
+              ),
+              onChanged: (value) {
+                if (item.value is int) {
+                  item.value = int.tryParse(value);
+                } else if (item.value is DateTime) {
+                  item.value = GlobalVariables.dateFormat.parse(value);
+                } else {
+                  item.value = value;
+                }
+              },
+            ),
+          ),
         ],
       ),
     );

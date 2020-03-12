@@ -16,16 +16,22 @@ class _AssetListState extends State<AssetList> {
     List<InputDialogItem> asset = [
       InputDialogItem(label: 'Ativo', hint: 'ex. MGLU3', value: ''),
       InputDialogItem(label: 'Quantidade', hint: 'ex. 100', value: 0),
+      InputDialogItem(
+          label: 'Data Operação',
+          hint: 'ex. 01/01/2010',
+          value: DateTime.now()),
     ];
 
     List<InputDialogItem> result = await asyncInputDialog(context,
         title: 'Qual ativo deseja adicionar', items: asset);
 
-    if(result == null) return;
+    if (result == null) return;
 
     await _assetDao.insert(Asset(
-      symbol: result.firstWhere((r) => r.label == 'Ativo').value.toString().trim(),
-      quantity: int.parse(result.firstWhere((r) => r.label == 'Quantidade').value.toString().trim()),
+      symbol:
+          result.firstWhere((r) => r.label == 'Ativo').value.toString().trim(),
+      quantity: result.firstWhere((r) => r.label == 'Quantidade').value,
+      operationDate: result.firstWhere((r) => r.label == 'Data Operação').value,
     ));
 
     setState(() {});
@@ -42,16 +48,15 @@ class _AssetListState extends State<AssetList> {
     return Scaffold(
       body: Center(
         child: FutureBuilder<List<Asset>>(
-          future: _assetDao.selectAllWithPrices(),
+          future: _assetDao.selectAll(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemBuilder: (_, int index) => ListTile(
                   title: Text(snapshot.data[index].symbol),
                   subtitle: Text(
-                      'Qtd. ${snapshot.data[index]?.quantity.toString()} '
-                          'R\$: ${snapshot.data[index]?.price.toString()} '
-                          'Atualizado: ${GlobalVariables.dateFormat.format(snapshot.data[index]?.priceUpdated)}'),
+                      'Quantidade: ${snapshot.data[index]?.quantity.toString()} '
+                      'Data: ${snapshot.data[index]?.operationDate != null ? GlobalVariables.dateFormat.format(snapshot.data[index]?.operationDate) : "Não informado"}'),
                   onLongPress: () => {deleteAsset(snapshot.data[index].id)},
                 ),
                 itemCount: snapshot.data.length,

@@ -33,7 +33,7 @@ class DonutChart extends StatelessWidget {
 
 class DonutChartItem {
   final String name;
-  final int value;
+  final double value;
 
   DonutChartItem(this.name, this.value);
 }
