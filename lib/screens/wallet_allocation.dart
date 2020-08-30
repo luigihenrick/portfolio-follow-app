@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:portfolio_follow/commons/variables.dart';
 import 'package:portfolio_follow/components/donut_chart.dart';
 import 'package:portfolio_follow/database/dao/asset_dao.dart';
-import 'package:portfolio_follow/models/asset.dart';
+import 'package:portfolio_follow/models/asset_customer.dart';
 
 const _chartTitle = 'Wallet Allocation';
 
@@ -59,7 +59,7 @@ Future<List<DonutChartItem>> fetchWalletAllocationData() async {
   AssetDao assetDao = AssetDao();
   List<DonutChartItem> result = List();
 
-  for (Asset asset in await assetDao.selectAllWithPrices()) {
+  for (AssetCustomer asset in await assetDao.selectAllWithPrices()) {
     result.add(DonutChartItem(
         asset.symbol, (asset.quantity * asset.price).toDouble()));
   }

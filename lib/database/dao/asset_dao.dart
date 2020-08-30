@@ -1,7 +1,7 @@
-import 'package:portfolio_follow/models/quote.dart';
-import 'package:portfolio_follow/services/alpha_vantage.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:portfolio_follow/models/asset.dart';
+import 'package:portfolio_follow/services/portfolio_follow_api.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:portfolio_follow/models/asset_customer.dart';
 import 'package:portfolio_follow/database/app_database.dart';
 
 class AssetDao {
@@ -21,13 +21,13 @@ class AssetDao {
       '$_price DECIMAL, '
       '$_priceUpdated TEXT)';
 
-  Future<int> insert(Asset asset) async {
+  Future<int> insert(AssetCustomer asset) async {
     final Database db = await getDatabase();
 
     return db.insert(_tableName, _toMap(asset));
   }
 
-  Future<int> update(Asset asset) async {
+  Future<int> update(AssetCustomer asset) async {
     final Database db = await getDatabase();
 
     return db.update(_tableName, _toMap(asset),
@@ -40,14 +40,14 @@ class AssetDao {
     return db.delete(_tableName, where: '$_id = ?', whereArgs: [assetId]);
   }
 
-  Future<List<Asset>> selectAll() async {
+  Future<List<AssetCustomer>> selectAll() async {
     final Database db = await getDatabase();
     final List<Map<String, dynamic>> assets = await db.query(_tableName);
 
     return _toList(assets);
   }
 
-  Map<String, dynamic> _toMap(Asset asset) {
+  Map<String, dynamic> _toMap(AssetCustomer asset) {
     Map<String, dynamic> values = Map();
 
     values[_symbol] = asset.symbol.trim();
@@ -63,11 +63,11 @@ class AssetDao {
     return values;
   }
 
-  List<Asset> _toList(List<Map<String, dynamic>> assets) {
-    final List<Asset> result = List();
+  List<AssetCustomer> _toList(List<Map<String, dynamic>> assets) {
+    final List<AssetCustomer> result = List();
 
     for (Map<String, dynamic> asset in assets) {
-      result.add(Asset(
+      result.add(AssetCustomer(
         id: asset[_id],
         symbol: asset[_symbol],
         quantity: asset[_quantity],
@@ -79,20 +79,19 @@ class AssetDao {
     return result;
   }
 
-  Future<List<Asset>> selectAllWithPrices() async {
+  Future<List<AssetCustomer>> selectAllWithPrices() async {
     AssetDao _dao = AssetDao();
-    List<Asset> result = List();
+    List<AssetCustomer> result = List();
 
-    for (Asset asset in await _dao.selectAll()) {
-      if (asset.priceUpdated == null ||
-          asset.price == null ||
-          DateTime.now().difference(asset.priceUpdated).inMinutes > 15) {
-        Quote quote = await AlphaVantageService.fetchQuoteData(asset.symbol);
-        asset.price = quote?.globalQuote?.price;
-        asset.priceUpdated = DateTime.now();
-        _dao.update(asset);
+    for (AssetCustomer assetCustomer in await _dao.selectAll()) {
+      if (assetCustomer.priceUpdated == null || assetCustomer.price == null || DateTime.now().difference(assetCustomer.priceUpdated).inMinutes > 15) {
+        var quote = await PortfolioFollowService.fetchQuoteData(assetCustomer.symbol);
+
+        assetCustomer.price = quote?.precos?.first?.valor;
+        assetCustomer.priceUpdated = DateTime.now();
+        _dao.update(assetCustomer);
       }
-      result.add(asset);
+      result.add(assetCustomer);
     }
 
     return result;

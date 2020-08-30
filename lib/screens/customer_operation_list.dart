@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:portfolio_follow/commons/variables.dart';
 import 'package:portfolio_follow/components/input_dialog.dart';
 import 'package:portfolio_follow/database/dao/asset_dao.dart';
-import 'package:portfolio_follow/models/asset.dart';
+import 'package:portfolio_follow/models/asset_customer.dart';
 
 class AssetList extends StatefulWidget {
   @override
@@ -14,12 +14,9 @@ class _AssetListState extends State<AssetList> {
 
   Future<void> insertAsset(BuildContext context) async {
     List<InputDialogItem> asset = [
+      //InputDialogItem(label: 'Tipo', hint: 'ex. Renda Variável', value: 'RV'),
       InputDialogItem(label: 'Ativo', hint: 'ex. MGLU3', value: ''),
-      InputDialogItem(label: 'Quantidade', hint: 'ex. 100', value: 0),
-      InputDialogItem(
-          label: 'Data Operação',
-          hint: 'ex. 01/01/2010',
-          value: DateTime.now()),
+      InputDialogItem(label: 'Quantidade', hint: 'ex. 100', value: 0)
     ];
 
     List<InputDialogItem> result = await asyncInputDialog(context,
@@ -27,11 +24,10 @@ class _AssetListState extends State<AssetList> {
 
     if (result == null) return;
 
-    await _assetDao.insert(Asset(
-      symbol:
-          result.firstWhere((r) => r.label == 'Ativo').value.toString().trim(),
+    await _assetDao.insert(AssetCustomer(
+      symbol: result.firstWhere((r) => r.label == 'Ativo').value.toString().trim(),
       quantity: result.firstWhere((r) => r.label == 'Quantidade').value,
-      operationDate: result.firstWhere((r) => r.label == 'Data Operação').value,
+      operationDate: result.firstWhere((r) => r.label == 'Data Operação')?.value ?? DateTime.now(),
     ));
 
     setState(() {});
@@ -47,7 +43,7 @@ class _AssetListState extends State<AssetList> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<List<Asset>>(
+        child: FutureBuilder<List<AssetCustomer>>(
           future: _assetDao.selectAll(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {

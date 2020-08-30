@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/commons/variables.dart';
 import 'package:portfolio_follow/database/dao/asset_dao.dart';
-import 'package:portfolio_follow/models/asset.dart';
+import 'package:portfolio_follow/models/asset_customer.dart';
 
 class RealtimeQuote extends StatelessWidget {
   final AssetDao _assetDao = AssetDao();
@@ -9,7 +9,7 @@ class RealtimeQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<Asset>>(
+      body: FutureBuilder<List<AssetCustomer>>(
         future: _assetDao.selectAllWithPrices(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -25,10 +25,10 @@ class RealtimeQuote extends StatelessWidget {
     );
   }
 
-  List<Widget> _createWidgets(AsyncSnapshot<List<Asset>> snapshot) {
+  List<Widget> _createWidgets(AsyncSnapshot<List<AssetCustomer>> snapshot) {
     List<Widget> result = List();
 
-    for (Asset asset in snapshot.data) {
+    for (AssetCustomer asset in snapshot.data) {
       result.add(ListTile(
         title: Text(asset.symbol),
         subtitle: Text(

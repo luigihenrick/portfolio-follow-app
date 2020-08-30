@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/components/input_dialog.dart';
 import 'package:portfolio_follow/components/line_chart.dart';
-import 'package:portfolio_follow/models/history_price.dart';
-import 'package:portfolio_follow/services/alpha_vantage.dart';
+import 'file:///C:/repos/portfolio-follow-app/lib/models/asset.dart';
+import 'package:portfolio_follow/services/portfolio_follow_api.dart';
 
 const _chartTitle = 'History Prices';
 
@@ -26,14 +26,14 @@ class _HistoryPerformanceState extends State<HistoryPerformance> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<PriceHistoryDaily>(
-              future: AlphaVantageService.fetchPriceHistoryData(_symbol),
+            FutureBuilder<Asset>(
+              future: PortfolioFollowService.fetchPriceHistoryData(_symbol),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Column(
                     children: <Widget>[
                       new Text(
-                        'Ativo: ${snapshot.data.metaData.symbol}',
+                        'Ativo: ${snapshot.data.nome}',
                         style: TextStyle(fontSize: 25, color: Colors.grey),
                       ),
                       new Padding(
@@ -43,9 +43,9 @@ class _HistoryPerformanceState extends State<HistoryPerformance> {
                           height: 400.0,
                           child: LineChart(
                             _chartTitle,
-                            snapshot.data.dailyTimeSeries
+                            snapshot.data.precos.take(90)
                                 .map((item) =>
-                                    new LineChartItem(item.date, item.close))
+                                    new LineChartItem(item.data, item.valor))
                                 .toList(),
                             animate: widget.animate,
                           ),

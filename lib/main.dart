@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio_follow/commons/variables.dart';
 import 'package:portfolio_follow/screens/history_performance.dart';
-import 'package:portfolio_follow/screens/asset_list.dart';
+import 'package:portfolio_follow/screens/customer_operation_list.dart';
 import 'package:portfolio_follow/screens/summary_navigation_bar.dart';
 import 'package:portfolio_follow/screens/realtime_quote.dart';
 import 'package:portfolio_follow/screens/wallet_allocation.dart';
